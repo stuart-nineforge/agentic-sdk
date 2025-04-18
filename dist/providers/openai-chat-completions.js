@@ -15,7 +15,7 @@ async function runOpenAIChatCompletion(req) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     const { provider, instructions, input, tools, format } = req;
     // initialize OpenAI client with credentials
-    const openai = new openai_1.default({ apiKey: provider.credentials.apiKey });
+    const openai = new openai_1.default({ ...(provider.credentials ? provider.credentials : {}) });
     const messages = [
         { role: "system", content: instructions },
         ...(typeof input === "string"
@@ -61,5 +61,4 @@ async function runOpenAIChatCompletion(req) {
     type: "OpenAI",
     api: "ChatCompletions",
     model: "gpt-4.1-mini",
-    credentials: { apiKey: process.env.OPENAI_API_KEY },
 });

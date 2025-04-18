@@ -12,9 +12,9 @@ const index_1 = require("./index");
  * Executes an OpenAI Responses API request.
  */
 async function runOpenAIResponse(req) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f;
     const { provider, instructions, input, tools, format } = req;
-    const openai = new openai_1.default({ apiKey: (_a = provider.options) === null || _a === void 0 ? void 0 : _a.apiKey });
+    const openai = new openai_1.default({ ...(provider.credentials ? provider.credentials : {}) });
     // @ts-ignore: bypass type mismatch for create call
     const response = await openai.responses.create({
         model: provider.model,
@@ -46,10 +46,10 @@ async function runOpenAIResponse(req) {
         output,
         ...(toolCalls ? { toolCalls } : {}),
         usage: {
-            input_tokens: ((_b = response.usage) === null || _b === void 0 ? void 0 : _b.input_tokens) || 0,
-            output_tokens: ((_c = response.usage) === null || _c === void 0 ? void 0 : _c.output_tokens) || 0,
-            cached_tokens: ((_e = (_d = response.usage) === null || _d === void 0 ? void 0 : _d.input_tokens_details) === null || _e === void 0 ? void 0 : _e.cached_tokens) || 0,
-            reasoning_tokens: ((_g = (_f = response.usage) === null || _f === void 0 ? void 0 : _f.output_tokens_details) === null || _g === void 0 ? void 0 : _g.reasoning_tokens) || 0,
+            input_tokens: ((_a = response.usage) === null || _a === void 0 ? void 0 : _a.input_tokens) || 0,
+            output_tokens: ((_b = response.usage) === null || _b === void 0 ? void 0 : _b.output_tokens) || 0,
+            cached_tokens: ((_d = (_c = response.usage) === null || _c === void 0 ? void 0 : _c.input_tokens_details) === null || _d === void 0 ? void 0 : _d.cached_tokens) || 0,
+            reasoning_tokens: ((_f = (_e = response.usage) === null || _e === void 0 ? void 0 : _e.output_tokens_details) === null || _f === void 0 ? void 0 : _f.reasoning_tokens) || 0,
         },
     };
 }
@@ -70,5 +70,4 @@ function getToolCalls(output) {
     type: "OpenAI",
     api: "Responses",
     model: "gpt-4.1-mini",
-    credentials: { apiKey: process.env.OPENAI_API_KEY },
 });

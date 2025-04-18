@@ -12,7 +12,7 @@ export async function runOpenAIResponse(
     req: ExecutionRequest
 ): Promise<ExecutionResponse> {
     const { provider, instructions, input, tools, format } = req;
-    const openai = new OpenAI({ apiKey: (provider.options as any)?.apiKey });
+    const openai = new OpenAI({ ...(provider.credentials ? provider.credentials : {}) });
 
     // @ts-ignore: bypass type mismatch for create call
     const response = await openai.responses.create(
@@ -77,5 +77,4 @@ registerDefaultProvider({
   type: "OpenAI",
   api: "Responses",
   model: "gpt-4.1-mini",
-  credentials: { apiKey: process.env.OPENAI_API_KEY },
 } as Provider);

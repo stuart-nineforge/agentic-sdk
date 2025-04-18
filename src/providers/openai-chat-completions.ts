@@ -12,7 +12,7 @@ export async function runOpenAIChatCompletion(
 ): Promise<ExecutionResponse> {
   const { provider, instructions, input, tools, format } = req;
   // initialize OpenAI client with credentials
-  const openai = new OpenAI({ apiKey: provider.credentials.apiKey });
+  const openai = new OpenAI({ ...(provider.credentials ? provider.credentials : {}) });
 
   const messages = [
     { role: "system", content: instructions },
@@ -67,5 +67,4 @@ registerDefaultProvider({
   type: "OpenAI",
   api: "ChatCompletions",
   model: "gpt-4.1-mini",
-  credentials: { apiKey: process.env.OPENAI_API_KEY },
 } as Provider);
