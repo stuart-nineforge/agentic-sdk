@@ -1,14 +1,22 @@
 {
+  "name": "agentic-sdk",
+  "version": "0.1.0",
+  "description": "A modular, extensible TypeScript SDK for agentic applications with pluggable LLM providers.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stuart-nineforge/agentic-sdk.git"
+  },
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^16.5.0",
     "json-schema": "^0.4.0",
-    "openai": "^4.95.0",
-    "react": "^18.3.1"
+    "openai": "^4.95.0"
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.15",
     "@types/node": "^22.14.1",
-    "@types/react": "^19.1.2",
     "typescript": "^5.8.3"
   },
   "scripts": {
