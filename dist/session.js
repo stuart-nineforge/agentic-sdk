@@ -1,30 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SummarizingSession = exports.Session = void 0;
+exports.Session = void 0;
 /**
  * Maintains a conversation history for an agent.
  */
 class Session {
-    constructor(messages = []) {
-        this.messages = messages;
+    constructor(input) {
+        if (Array.isArray(input)) {
+            this.input = input;
+        }
+        else if (input) {
+            this.input = [input];
+        }
+        else {
+            this.input = [];
+        }
     }
-    addMessage(message) {
-        this.messages.push(message);
+    addInput(input) {
+        this.input.push(input);
     }
-    getMessages() {
-        return this.messages;
+    getInput() {
+        return this.input;
     }
 }
 exports.Session = Session;
-class SummarizingSession extends Session {
-    constructor(messages = []) {
-        super(messages);
-    }
-    addMessage(message) {
-        super.addMessage(message);
-    }
-    getMessages() {
-        return super.getMessages();
-    }
-}
-exports.SummarizingSession = SummarizingSession;

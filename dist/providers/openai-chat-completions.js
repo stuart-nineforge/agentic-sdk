@@ -12,7 +12,7 @@ const index_1 = require("./index");
  * Executes an OpenAI Chat Completions request.
  */
 async function runOpenAIChatCompletion(req) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     const { provider, instructions, input, tools, format } = req;
     // initialize OpenAI client with credentials
     const openai = new openai_1.default({ ...(provider.credentials ? provider.credentials : {}) });
@@ -40,19 +40,26 @@ async function runOpenAIChatCompletion(req) {
                 tool_choice: "auto",
             } : {}),
     });
-    let output = ((_c = (_b = (_a = response.choices) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.content) || "";
-    if ((format === null || format === void 0 ? void 0 : format.type) === "json") {
-        output = JSON.parse(((_f = (_e = (_d = response.choices) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.message) === null || _f === void 0 ? void 0 : _f.content) || "");
-    }
-    const toolCalls = ((_j = (_h = (_g = response.choices) === null || _g === void 0 ? void 0 : _g[0]) === null || _h === void 0 ? void 0 : _h.message) === null || _j === void 0 ? void 0 : _j.tool_calls) || null;
+    const message = (_b = (_a = response.choices) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.message;
+    let output = [{
+            id: response.id,
+            type: "message",
+            role: "assistant",
+            content: [
+                { type: "output_text", text: message.content || "", annotations: [] }
+            ],
+            status: "completed"
+        }];
+    const toolCalls = ((_e = (_d = (_c = response.choices) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.message) === null || _e === void 0 ? void 0 : _e.tool_calls) || null;
     return {
         output,
         ...(toolCalls ? { toolCalls } : {}),
         usage: {
-            input_tokens: ((_k = response.usage) === null || _k === void 0 ? void 0 : _k.prompt_tokens) || 0,
-            output_tokens: ((_l = response.usage) === null || _l === void 0 ? void 0 : _l.completion_tokens) || 0,
-            cached_tokens: ((_o = (_m = response.usage) === null || _m === void 0 ? void 0 : _m.prompt_tokens_details) === null || _o === void 0 ? void 0 : _o.cached_tokens) || 0,
-            reasoning_tokens: ((_q = (_p = response.usage) === null || _p === void 0 ? void 0 : _p.completion_tokens_details) === null || _q === void 0 ? void 0 : _q.reasoning_tokens) || 0,
+            input_tokens: ((_f = response.usage) === null || _f === void 0 ? void 0 : _f.prompt_tokens) || 0,
+            output_tokens: ((_g = response.usage) === null || _g === void 0 ? void 0 : _g.completion_tokens) || 0,
+            cached_tokens: ((_j = (_h = response.usage) === null || _h === void 0 ? void 0 : _h.prompt_tokens_details) === null || _j === void 0 ? void 0 : _j.cached_tokens) || 0,
+            reasoning_tokens: ((_l = (_k = response.usage) === null || _k === void 0 ? void 0 : _k.completion_tokens_details) === null || _l === void 0 ? void 0 : _l.reasoning_tokens) || 0,
+            total_tokens: ((_m = response.usage) === null || _m === void 0 ? void 0 : _m.total_tokens) || 0,
         },
     };
 }

@@ -1,17 +1,11 @@
 import { JSONSchema7 } from "json-schema";
-import { runOpenAIChatCompletion } from "./providers/openai-chat-completions";
-import { runOpenAIResponse } from "./providers/openai-responses";
 import { Provider } from "./providers";
-
-/** A message in the execution input. */
-export interface Message {
-  role: "system" | "user" | "assistant";
-  content?: string;
-  tool_calls?: ToolCall[];
-}
+import { OpenAI } from "openai";
 
 /** Input to execution: either a plain string or an array of messages. */
-export type Input = string | Message[];
+export type InputItem = OpenAI.Responses.ResponseInputItem;
+export type Input = OpenAI.Responses.ResponseInput;
+export type OutputItem = OpenAI.Responses.ResponseOutputItem;
 
 export interface Credentials extends Record<string, any> {};
 
@@ -33,10 +27,27 @@ export interface FunctionCall {
   arguments: string;
 }
 
+export interface ToolCallResult {
+  id: string;
+  output: string;
+  status: "completed" | "failed";
+  error?: Error;
+}
+
 /** Response format. */
 export type Format =
   | { type: "text" }
   | { type: "json"; schema: JSONSchema7 };
+
+/** Usage information. */
+export interface Usage extends Record<string, any> {
+  input_tokens: number;
+  output_tokens: number;
+  cached_tokens: number;
+  reasoning_tokens: number;
+  total_tokens: number;
+  duration?: number;
+};
 
 /** Execution request parameters. */
 export interface ExecutionRequest {
@@ -47,16 +58,12 @@ export interface ExecutionRequest {
   format?: Format;
 }
 
-export interface Usage extends Record<string, any> {
-  input_tokens: number;
-  output_tokens: number;
-  cached_tokens: number;
-  reasoning_tokens: number;
-};
-
+/** Execution response. */
 export interface ExecutionResponse {
-  output: string | Message[];
+  output?: OutputItem[];
+  output_text?: string;
   toolCalls?: ToolCall[];
+  error?: Error;
   usage: Usage;
 }
 
@@ -72,16 +79,33 @@ export function registerProviderHandler(type: string, api: string | undefined, h
 export async function execute(
   req: ExecutionRequest
 ): Promise<ExecutionResponse> {
-  if (!req || !req.provider) {
-    throw new Error("Provider is required");
-  }
-  const providerType = req.provider.type;
-  const providerApi = req.provider.api || "default";
+  const start = Date.now();
+  try {
+    if (!req || !req.provider) {
+      throw new Error("Provider is required");
+    }
+    const providerType = req.provider.type;
+    const providerApi = req.provider.api || "default";
 
-  const provider = providerRegistry[providerType];
-  const handler = provider[providerApi];
-  if (!handler) {
-    throw new Error(`No handler registered for provider type: ${providerType} api: ${providerApi}`);
+    const provider = providerRegistry[providerType];
+    const handler = provider[providerApi];
+    if (!handler) {
+      throw new Error(`No handler registered for provider type: ${providerType} api: ${providerApi}`);
+    }
+    const result = await handler(req);
+    result.usage.duration = Date.now() - start;
+    return result;
+  } catch (error: any) {
+    return {
+      error: error as Error,
+      usage: {
+        input_tokens: 0,
+        output_tokens: 0,
+        cached_tokens: 0,
+        reasoning_tokens: 0,
+        total_tokens: 0,
+        duration: Date.now() - start,
+      },
+    };
   }
-  return handler(req);
 } 

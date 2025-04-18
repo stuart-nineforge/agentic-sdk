@@ -1,34 +1,27 @@
-import { Message } from "./execution";
+import { Input, InputItem } from "./execution";
 
 /**
  * Maintains a conversation history for an agent.
  */
 export class Session {
-    messages: Message[];
+    input: Input;
 
-    constructor(messages: Message[] = []) {
-        this.messages = messages;
+    constructor(input?: Input | InputItem) {
+        if (Array.isArray(input)) {
+            this.input = input;
+        } else if (input) {
+            this.input = [input] as Input;
+        } else {
+            this.input = [];
+        }
+
     }
 
-    addMessage(message: Message) {
-        this.messages.push(message);
+    addInput(input: InputItem) {
+        this.input.push(input);
     }
             
-    getMessages() {
-        return this.messages;
-    }
-}
-
-export class SummarizingSession extends Session {
-    constructor(messages: Message[] = []) {
-        super(messages);
-    }
-
-    addMessage(message: Message) {
-        super.addMessage(message);
-    }
-
-    getMessages() {
-        return super.getMessages();
+    getInput() {
+        return this.input;
     }
 }

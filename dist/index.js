@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Providers = exports.registerDefaultProvider = exports.registerProviderHandler = exports.Session = exports.Agent = exports.execute = void 0;
 require("./providers/openai-chat-completions");
 require("./providers/openai-responses");
+require("./functions/request");
 const execution_1 = require("./execution");
 Object.defineProperty(exports, "execute", { enumerable: true, get: function () { return execution_1.execute; } });
 Object.defineProperty(exports, "registerProviderHandler", { enumerable: true, get: function () { return execution_1.registerProviderHandler; } });

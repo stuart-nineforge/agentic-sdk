@@ -1,6 +1,6 @@
 // @ts-ignore: Suppress missing module declaration for openai
 import OpenAI from "openai";
-import { ExecutionRequest, ExecutionResponse, Message, ToolCall } from "../execution";
+import { ExecutionRequest, ExecutionResponse, ToolCall } from "../execution";
 import { ResponseOutputItem } from "openai/resources/responses/responses";
 import { registerProviderHandler } from "../execution";
 import { registerDefaultProvider, Provider } from "./index";
@@ -35,25 +35,18 @@ export async function runOpenAIResponse(
         } as any
     );
 
-    // extract text from response
-    let output;
-
-    if (!format?.type ||format?.type === "text") {
-        output = response.output_text || "";
-    } else if (format?.type === "json") {
-        output = JSON.parse(response.output_text);
-    }
-
     const toolCalls = getToolCalls(response.output);
 
     return {
-        output,
+        output: response.output,
+        output_text: response.output_text,
         ...(toolCalls ? { toolCalls } : {}),
         usage: {
             input_tokens: response.usage?.input_tokens || 0,
             output_tokens: response.usage?.output_tokens || 0,
             cached_tokens: response.usage?.input_tokens_details?.cached_tokens || 0,
             reasoning_tokens: response.usage?.output_tokens_details?.reasoning_tokens || 0,
+            total_tokens: response.usage?.total_tokens || 0,
         },
     };
 }

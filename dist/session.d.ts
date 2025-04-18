@@ -1,15 +1,10 @@
-import { Message } from "./execution";
+import { Input, InputItem } from "./execution";
 /**
  * Maintains a conversation history for an agent.
  */
 export declare class Session {
-    messages: Message[];
-    constructor(messages?: Message[]);
-    addMessage(message: Message): void;
-    getMessages(): Message[];
-}
-export declare class SummarizingSession extends Session {
-    constructor(messages?: Message[]);
-    addMessage(message: Message): void;
-    getMessages(): Message[];
+    input: Input;
+    constructor(input?: Input | InputItem);
+    addInput(input: InputItem): void;
+    getInput(): import("openai/resources/responses/responses.mjs").ResponseInput;
 }

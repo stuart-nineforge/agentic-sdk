@@ -1,13 +1,10 @@
 import { JSONSchema7 } from "json-schema";
 import { Provider } from "./providers";
-/** A message in the execution input. */
-export interface Message {
-    role: "system" | "user" | "assistant";
-    content?: string;
-    tool_calls?: ToolCall[];
-}
+import { OpenAI } from "openai";
 /** Input to execution: either a plain string or an array of messages. */
-export type Input = string | Message[];
+export type InputItem = OpenAI.Responses.ResponseInputItem;
+export type Input = OpenAI.Responses.ResponseInput;
+export type OutputItem = OpenAI.Responses.ResponseOutputItem;
 export interface Credentials extends Record<string, any> {
 }
 /** Tool definition. */
@@ -25,6 +22,12 @@ export interface FunctionCall {
     name: string;
     arguments: string;
 }
+export interface ToolCallResult {
+    id: string;
+    output: string;
+    status: "completed" | "failed";
+    error?: Error;
+}
 /** Response format. */
 export type Format = {
     type: "text";
@@ -32,6 +35,15 @@ export type Format = {
     type: "json";
     schema: JSONSchema7;
 };
+/** Usage information. */
+export interface Usage extends Record<string, any> {
+    input_tokens: number;
+    output_tokens: number;
+    cached_tokens: number;
+    reasoning_tokens: number;
+    total_tokens: number;
+    duration?: number;
+}
 /** Execution request parameters. */
 export interface ExecutionRequest {
     provider: Provider;
@@ -40,15 +52,12 @@ export interface ExecutionRequest {
     tools?: Tool[];
     format?: Format;
 }
-export interface Usage extends Record<string, any> {
-    input_tokens: number;
-    output_tokens: number;
-    cached_tokens: number;
-    reasoning_tokens: number;
-}
+/** Execution response. */
 export interface ExecutionResponse {
-    output: string | Message[];
+    output?: OutputItem[];
+    output_text?: string;
     toolCalls?: ToolCall[];
+    error?: Error;
     usage: Usage;
 }
 export type ProviderHandler = (req: ExecutionRequest) => Promise<ExecutionResponse>;

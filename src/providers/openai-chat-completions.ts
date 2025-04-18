@@ -1,6 +1,6 @@
 // @ts-ignore: Suppress missing module declaration for openai
 import OpenAI from "openai";
-import { ExecutionRequest, ExecutionResponse, Message } from "../execution";
+import { ExecutionRequest, ExecutionResponse, Input, InputItem, OutputItem } from "../execution";
 import { registerProviderHandler } from "../execution";
 import { registerDefaultProvider, Provider } from "./index";
 
@@ -42,10 +42,16 @@ export async function runOpenAIChatCompletion(
     } as any
   );
 
-  let output : string | Message[] = response.choices?.[0]?.message?.content || "";
-  if (format?.type === "json") {
-    output = JSON.parse(response.choices?.[0]?.message?.content || "");
-  }
+  const message = response.choices?.[0]?.message;
+  let output : OutputItem[] = [{ 
+    id: response.id,
+    type: "message", 
+    role: "assistant", 
+    content: [
+      { type: "output_text", text: message.content || "", annotations: [] }
+    ],
+    status: "completed"
+  }];
 
   const toolCalls = response.choices?.[0]?.message?.tool_calls || null;
 
@@ -57,6 +63,7 @@ export async function runOpenAIChatCompletion(
       output_tokens: response.usage?.completion_tokens || 0,
       cached_tokens: response.usage?.prompt_tokens_details?.cached_tokens || 0,
       reasoning_tokens: response.usage?.completion_tokens_details?.reasoning_tokens || 0,
+      total_tokens: response.usage?.total_tokens || 0,
     },
   };
 }

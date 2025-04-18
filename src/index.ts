@@ -1,11 +1,15 @@
 import "./providers/openai-chat-completions";
 import "./providers/openai-responses";
+import "./functions/request";
 
 import {
     ExecutionRequest, 
     ExecutionResponse, 
-    Message, 
     Tool,
+    ToolCallResult,
+    Input,
+    InputItem,
+    OutputItem,
     execute, 
     registerProviderHandler, 
 } from "./execution";
@@ -17,8 +21,11 @@ export {
     execute,
     ExecutionRequest, 
     ExecutionResponse, 
-    Message, 
+    Input,
+    InputItem,
+    OutputItem,
     Tool,
+    ToolCallResult,
     Agent, 
     Session, 
     Provider,

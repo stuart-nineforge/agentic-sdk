@@ -12,7 +12,7 @@ const index_1 = require("./index");
  * Executes an OpenAI Responses API request.
  */
 async function runOpenAIResponse(req) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     const { provider, instructions, input, tools, format } = req;
     const openai = new openai_1.default({ ...(provider.credentials ? provider.credentials : {}) });
     // @ts-ignore: bypass type mismatch for create call
@@ -33,23 +33,17 @@ async function runOpenAIResponse(req) {
                 tool_choice: "auto",
             } : {}),
     });
-    // extract text from response
-    let output;
-    if (!(format === null || format === void 0 ? void 0 : format.type) || (format === null || format === void 0 ? void 0 : format.type) === "text") {
-        output = response.output_text || "";
-    }
-    else if ((format === null || format === void 0 ? void 0 : format.type) === "json") {
-        output = JSON.parse(response.output_text);
-    }
     const toolCalls = getToolCalls(response.output);
     return {
-        output,
+        output: response.output,
+        output_text: response.output_text,
         ...(toolCalls ? { toolCalls } : {}),
         usage: {
             input_tokens: ((_a = response.usage) === null || _a === void 0 ? void 0 : _a.input_tokens) || 0,
             output_tokens: ((_b = response.usage) === null || _b === void 0 ? void 0 : _b.output_tokens) || 0,
             cached_tokens: ((_d = (_c = response.usage) === null || _c === void 0 ? void 0 : _c.input_tokens_details) === null || _d === void 0 ? void 0 : _d.cached_tokens) || 0,
             reasoning_tokens: ((_f = (_e = response.usage) === null || _e === void 0 ? void 0 : _e.output_tokens_details) === null || _f === void 0 ? void 0 : _f.reasoning_tokens) || 0,
+            total_tokens: ((_g = response.usage) === null || _g === void 0 ? void 0 : _g.total_tokens) || 0,
         },
     };
 }

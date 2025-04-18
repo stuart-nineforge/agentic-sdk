@@ -10,15 +10,33 @@ function registerProviderHandler(type, api, handler) {
     providerRegistry[type][api || "default"] = handler;
 }
 async function execute(req) {
-    if (!req || !req.provider) {
-        throw new Error("Provider is required");
+    const start = Date.now();
+    try {
+        if (!req || !req.provider) {
+            throw new Error("Provider is required");
+        }
+        const providerType = req.provider.type;
+        const providerApi = req.provider.api || "default";
+        const provider = providerRegistry[providerType];
+        const handler = provider[providerApi];
+        if (!handler) {
+            throw new Error(`No handler registered for provider type: ${providerType} api: ${providerApi}`);
+        }
+        const result = await handler(req);
+        result.usage.duration = Date.now() - start;
+        return result;
     }
-    const providerType = req.provider.type;
-    const providerApi = req.provider.api || "default";
-    const provider = providerRegistry[providerType];
-    const handler = provider[providerApi];
-    if (!handler) {
-        throw new Error(`No handler registered for provider type: ${providerType} api: ${providerApi}`);
+    catch (error) {
+        return {
+            error: error,
+            usage: {
+                input_tokens: 0,
+                output_tokens: 0,
+                cached_tokens: 0,
+                reasoning_tokens: 0,
+                total_tokens: 0,
+                duration: Date.now() - start,
+            },
+        };
     }
-    return handler(req);
 }
