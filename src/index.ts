@@ -5,6 +5,7 @@ import {
     ExecutionRequest, 
     ExecutionResponse, 
     Message, 
+    Tool,
     execute, 
     registerProviderHandler, 
 } from "./execution";
@@ -17,6 +18,7 @@ export {
     ExecutionRequest, 
     ExecutionResponse, 
     Message, 
+    Tool,
     Agent, 
     Session, 
     Provider,
